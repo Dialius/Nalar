@@ -3,6 +3,7 @@ package com.davinza.nalar.ui.onboarding
 import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
+import androidx.compose.ui.res.painterResource
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -22,63 +23,158 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.davinza.nalar.ui.components.*
 import kotlinx.coroutines.delay
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.davinza.nalar.di.AppViewModelFactory
+import com.davinza.nalar.ui.auth.AuthState
+import com.davinza.nalar.ui.auth.AuthViewModel
 
 @Composable
-fun OnboardingHost(onFinished: () -> Unit) {
+fun OnboardingHost(role: String = "learner", onFinished: () -> Unit) {
     val navController = rememberNavController()
+    val context = LocalContext.current
+    val viewModel: AuthViewModel = viewModel(factory = AppViewModelFactory(context))
 
     NavHost(
         navController = navController,
-        startDestination = "info",
+        startDestination = "intro_1",
         enterTransition = { slideInHorizontally(initialOffsetX = { it }, animationSpec = tween(400)) },
         exitTransition = { slideOutHorizontally(targetOffsetX = { -it }, animationSpec = tween(400)) },
         popEnterTransition = { slideInHorizontally(initialOffsetX = { -it }, animationSpec = tween(400)) },
         popExitTransition = { slideOutHorizontally(targetOffsetX = { it }, animationSpec = tween(400)) }
     ) {
-        composable("info") {
-            InfoStep(
+        composable("intro_1") {
+            InfoStepTemplate(
+                title = if (role == "learner") "You'll get a little smarter every day — starting now." else "And the Parent of the Year award goes to...",
+                subtitle = "",
+                imageRes = com.davinza.nalar.R.drawable.mascot_happy,
+                onNext = { 
+                    if (role == "parent") navController.navigate("intro_2")
+                    else navController.navigate("target_choice")
+                }
+            )
+        }
+
+        composable("intro_2") {
+            InfoStepTemplate(
+                title = "We're here to help you support your child's learning.",
+                subtitle = "Track progress, assign lessons, and celebrate their wins together.",
+                imageRes = com.davinza.nalar.R.drawable.mascot_studying,
                 onNext = { navController.navigate("target_choice") }
             )
         }
+        
         composable("target_choice") {
-            TargetChoiceStep(
+            PillSelectionStepTemplate(
+                title = if (role == "learner") "Apa rumpun tes pilihanmu?" else "Apa rumpun tes pilihan anakmu?",
+                progress = 0.2f,
+                options = listOf("Saintek (Sains & Teknologi)", "Soshum (Sosial & Humaniora)", "Campuran"),
                 onNext = { navController.navigate("subject_choice") },
                 onBack = { navController.popBackStack() }
             )
         }
+        
         composable("subject_choice") {
-            SubjectChoiceStep(
-                onNext = { navController.navigate("email_input") },
+            GridSelectionStepTemplate(
+                title = if (role == "learner") "Materi apa yang ingin kamu kuasai lebih dulu?" else "Materi apa yang ingin anakmu kuasai lebih dulu?",
+                progress = 0.35f,
+                options = listOf(
+                    "Penalaran Kuantitatif" to com.davinza.nalar.R.drawable.subject_math_geometric,
+                    "Fisika" to com.davinza.nalar.R.drawable.subject_physics_geometric,
+                    "Biologi" to com.davinza.nalar.R.drawable.subject_biology_geometric,
+                    "Literasi Bahasa" to com.davinza.nalar.R.drawable.subject_language_geometric
+                ),
+                onNext = { navController.navigate("goal_choice") },
                 onBack = { navController.popBackStack() }
             )
         }
-        composable("email_input") {
-            EmailInputStep(
-                onNext = { navController.navigate("password_input") },
+
+        composable("goal_choice") {
+            PillSelectionStepTemplate(
+                title = if (role == "learner") "What's your top goal?" else "What's your top goal for them?",
+                progress = 0.5f,
+                options = listOf("Build a strong foundation", "Ace upcoming exams", "Learn something new", "Just for fun"),
+                onNext = { navController.navigate("affirmation") },
                 onBack = { navController.popBackStack() }
             )
         }
-        composable("password_input") {
-            PasswordInputStep(
+
+        composable("affirmation") {
+            InfoStepTemplate(
+                title = if (role == "learner") "A logical choice." else "That adds up.",
+                subtitle = "Let's see what we can do.",
+                imageRes = com.davinza.nalar.R.drawable.mascot_studying,
+                onNext = { navController.navigate("time_commitment") }
+            )
+        }
+
+        composable("time_commitment") {
+            PillSelectionStepTemplate(
+                title = if (role == "learner") "How much time do you want to commit?" else "How much time should they commit?",
+                progress = 0.65f,
+                options = listOf("3 mins a day", "10 mins a day", "15 mins a day", "30 mins a day"),
+                onNext = { navController.navigate("routine") },
+                onBack = { navController.popBackStack() }
+            )
+        }
+
+        composable("routine") {
+            PillSelectionStepTemplate(
+                title = "Let's make it a routine!",
+                progress = 0.8f,
+                options = listOf("Morning", "Afternoon", "Evening"),
                 onNext = { navController.navigate("loading_path") },
                 onBack = { navController.popBackStack() }
             )
         }
+
         composable("loading_path") {
             LoadingPathStep(
-                onNext = { navController.navigate("premium_upsell") }
+                title = if (role == "learner") "Loading your path..." else "Loading their path...",
+                onNext = { navController.navigate("path_ready") }
             )
         }
-        composable("premium_upsell") {
-            PremiumUpsellStep(
-                onNext = { onFinished() }
+
+        composable("path_ready") {
+            InfoStepTemplate(
+                title = if (role == "learner") "Your path is ready!" else "Their path is ready!",
+                subtitle = "We've created a personalized learning path to help reach the goal.",
+                imageRes = com.davinza.nalar.R.drawable.mascot_happy,
+                onNext = { navController.navigate("create_profile_intro") }
+            )
+        }
+
+        composable("create_profile_intro") {
+            InfoStepTemplate(
+                title = "Let's create your profile",
+                subtitle = "Save your progress and access it from anywhere.",
+                imageRes = com.davinza.nalar.R.drawable.mascot_happy,
+                onNext = { navController.navigate("step_final") }
+            )
+        }
+        
+        composable("step_final") {
+            CreateAccountStep(
+                viewModel = viewModel,
+                onNext = { onFinished() },
+                onBack = { navController.popBackStack() }
             )
         }
     }
 }
 
+
 @Composable
-fun InfoStep(onNext: () -> Unit) {
+fun InfoStepTemplate(
+    title: String,
+    subtitle: String,
+    buttonText: String = "Continue",
+    imageRes: Int = com.davinza.nalar.R.drawable.mascot_happy,
+    onNext: () -> Unit
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -89,86 +185,49 @@ fun InfoStep(onNext: () -> Unit) {
     ) {
         Spacer(modifier = Modifier.weight(1f))
         
-        // Mascot Placeholder
-        Box(
+        Image(
+            painter = painterResource(id = imageRes),
+            contentDescription = "Mascot",
             modifier = Modifier
-                .size(120.dp)
-                .clip(RoundedCornerShape(60.dp))
-                .background(Color(0xFF4CAF50)),
-            contentAlignment = Alignment.Center
-        ) {
-            Text("Mascot 3D", color = Color.White, fontWeight = FontWeight.Bold)
-        }
+                .size(180.dp)
+        )
 
         Spacer(modifier = Modifier.height(32.dp))
 
         Text(
-            text = "You'll get a little smarter every day — starting now.",
+            text = title,
             fontSize = 28.sp,
             fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Center,
             color = Color.Black
         )
-
-        Spacer(modifier = Modifier.weight(1f))
-
-        PushableButton(text = "Continue", onClick = onNext)
-    }
-}
-
-@Composable
-fun TargetChoiceStep(onNext: () -> Unit, onBack: () -> Unit) {
-    var selectedOption by remember { mutableStateOf<String?>(null) }
-    val options = listOf("Saintek (Sains & Teknologi)", "Soshum (Sosial & Humaniora)", "Campuran")
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.White)
-            .padding(24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        OnboardingProgressBar(progress = 0.2f, onBackClick = onBack)
-
-        Spacer(modifier = Modifier.height(32.dp))
-
-        Text(
-            text = "Apa rumpun tes pilihanmu?",
-            fontSize = 24.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color.Black
-        )
-
-        Spacer(modifier = Modifier.height(32.dp))
-
-        options.forEach { option ->
-            SelectionPill(
-                text = option,
-                isSelected = selectedOption == option,
-                onClick = { selectedOption = option }
-            )
+        
+        if (subtitle.isNotEmpty()) {
             Spacer(modifier = Modifier.height(16.dp))
+            Text(
+                text = subtitle,
+                fontSize = 16.sp,
+                textAlign = TextAlign.Center,
+                color = Color.Gray
+            )
         }
 
         Spacer(modifier = Modifier.weight(1f))
 
-        PushableButton(
-            text = "Continue",
-            enabled = selectedOption != null,
-            onClick = onNext
-        )
+        PushableButton(text = buttonText, onClick = onNext)
     }
 }
 
 @Composable
-fun SubjectChoiceStep(onNext: () -> Unit, onBack: () -> Unit) {
+fun PillSelectionStepTemplate(
+    title: String,
+    progress: Float,
+    options: List<String>,
+    buttonText: String = "Continue",
+    onNext: (String) -> Unit,
+    onBack: () -> Unit
+) {
     var selectedOption by remember { mutableStateOf<String?>(null) }
-    val options = listOf(
-        "Penalaran Kuantitatif",
-        "Fisika",
-        "Biologi",
-        "Literasi Bahasa Inggris"
-    )
 
     Column(
         modifier = Modifier
@@ -177,12 +236,12 @@ fun SubjectChoiceStep(onNext: () -> Unit, onBack: () -> Unit) {
             .padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        OnboardingProgressBar(progress = 0.4f, onBackClick = onBack)
+        OnboardingProgressBar(progress = progress, onBackClick = onBack)
 
         Spacer(modifier = Modifier.height(32.dp))
 
         Text(
-            text = "Materi apa yang ingin kamu kuasai lebih dulu?",
+            text = title,
             fontSize = 24.sp,
             fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Center,
@@ -203,126 +262,15 @@ fun SubjectChoiceStep(onNext: () -> Unit, onBack: () -> Unit) {
         Spacer(modifier = Modifier.weight(1f))
 
         PushableButton(
-            text = "Continue",
+            text = buttonText,
             enabled = selectedOption != null,
-            onClick = onNext
+            onClick = { selectedOption?.let { onNext(it) } }
         )
     }
 }
 
 @Composable
-fun EmailInputStep(onNext: () -> Unit, onBack: () -> Unit) {
-    var email by remember { mutableStateOf("") }
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.White)
-            .padding(24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        OnboardingProgressBar(progress = 0.6f, onBackClick = onBack)
-
-        Spacer(modifier = Modifier.height(32.dp))
-
-        // Mascot Placeholder small
-        Box(
-            modifier = Modifier
-                .size(60.dp)
-                .clip(RoundedCornerShape(20.dp))
-                .background(Color(0xFF4CAF50))
-        )
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        Text(
-            text = "What's your email?",
-            fontSize = 28.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color.Black
-        )
-
-        Spacer(modifier = Modifier.height(32.dp))
-
-        CustomTextField(
-            value = email,
-            onValueChange = { email = it },
-            label = "Email",
-            backgroundColor = Color(0xFFFFF9C4) // Yellowish bg like reference
-        )
-
-        Spacer(modifier = Modifier.weight(1f))
-
-        PushableButton(
-            text = "Continue",
-            enabled = email.isNotEmpty() && email.contains("@"),
-            onClick = onNext
-        )
-    }
-}
-
-@Composable
-fun PasswordInputStep(onNext: () -> Unit, onBack: () -> Unit) {
-    var password by remember { mutableStateOf("") }
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.White)
-            .padding(24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        OnboardingProgressBar(progress = 0.8f, onBackClick = onBack)
-
-        Spacer(modifier = Modifier.height(32.dp))
-
-        // Mascot Placeholder small
-        Box(
-            modifier = Modifier
-                .size(60.dp)
-                .clip(RoundedCornerShape(20.dp))
-                .background(Color(0xFF4CAF50))
-        )
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        Text(
-            text = "Create your password",
-            fontSize = 28.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color.Black
-        )
-
-        Spacer(modifier = Modifier.height(32.dp))
-
-        CustomTextField(
-            value = password,
-            onValueChange = { password = it },
-            label = "Password",
-            isPassword = true
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Text(
-            text = "By clicking create profile, I agree to Nalar's Terms and Privacy policy.",
-            fontSize = 12.sp,
-            color = Color.Gray,
-            textAlign = TextAlign.Center
-        )
-
-        Spacer(modifier = Modifier.weight(1f))
-
-        PushableButton(
-            text = "Create profile",
-            enabled = password.length >= 6,
-            onClick = onNext
-        )
-    }
-}
-
-@Composable
-fun LoadingPathStep(onNext: () -> Unit) {
+fun LoadingPathStep(title: String, onNext: () -> Unit) {
     LaunchedEffect(Unit) {
         delay(2500) // Simulate loading
         onNext()
@@ -341,7 +289,7 @@ fun LoadingPathStep(onNext: () -> Unit) {
         Spacer(modifier = Modifier.height(32.dp))
         
         Text(
-            text = "Loading your learning path recommendations",
+            text = title,
             fontSize = 24.sp,
             fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Center,
@@ -351,7 +299,16 @@ fun LoadingPathStep(onNext: () -> Unit) {
 }
 
 @Composable
-fun PremiumUpsellStep(onNext: () -> Unit) {
+fun GridSelectionStepTemplate(
+    title: String,
+    progress: Float,
+    options: List<Pair<String, Int?>>,
+    buttonText: String = "Continue",
+    onNext: (List<String>) -> Unit,
+    onBack: () -> Unit
+) {
+    var selectedOptions by remember { mutableStateOf(setOf<String>()) }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -359,41 +316,128 @@ fun PremiumUpsellStep(onNext: () -> Unit) {
             .padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        OnboardingProgressBar(progress = progress, onBackClick = onBack)
+
         Spacer(modifier = Modifier.height(32.dp))
 
         Text(
-            text = "Reach your goals faster with Premium",
-            fontSize = 32.sp,
+            text = title,
+            fontSize = 24.sp,
             fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Center,
             color = Color.Black
         )
 
-        Spacer(modifier = Modifier.height(48.dp))
+        Spacer(modifier = Modifier.height(32.dp))
 
-        // Comparison Table Placeholder
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(300.dp)
-                .clip(RoundedCornerShape(24.dp))
-                .background(Color(0xFFF5F5F5)),
-            contentAlignment = Alignment.Center
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(2),
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            modifier = Modifier.weight(1f)
         ) {
-            Text("Free vs Premium Table Component", color = Color.Gray)
+            items(options) { (text, iconRes) ->
+                GridSelectionCard(
+                    text = text,
+                    iconRes = iconRes,
+                    isSelected = selectedOptions.contains(text),
+                    onClick = {
+                        selectedOptions = if (selectedOptions.contains(text)) {
+                            selectedOptions - text
+                        } else {
+                            selectedOptions + text
+                        }
+                    }
+                )
+            }
         }
 
-        Spacer(modifier = Modifier.weight(1f))
+        Spacer(modifier = Modifier.height(16.dp))
 
         PushableButton(
-            text = "Learn more",
-            onClick = onNext
+            text = buttonText,
+            enabled = selectedOptions.isNotEmpty(),
+            onClick = { onNext(selectedOptions.toList()) }
+        )
+    }
+}
+
+@Composable
+fun CreateAccountStep(
+    viewModel: AuthViewModel,
+    onNext: () -> Unit, 
+    onBack: () -> Unit
+) {
+    val authState by viewModel.authState.collectAsState()
+    
+    var name by remember { mutableStateOf("") }
+    var email by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+    val context = LocalContext.current
+
+    LaunchedEffect(authState) {
+        if (authState is AuthState.Success) {
+            onNext()
+        } else if (authState is AuthState.Error) {
+            android.widget.Toast.makeText(context, (authState as AuthState.Error).message, android.widget.Toast.LENGTH_LONG).show()
+        }
+    }
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.White)
+            .padding(24.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        OnboardingProgressBar(progress = 0.9f, onBackClick = onBack)
+
+        Spacer(modifier = Modifier.height(32.dp))
+
+        Text(
+            text = "Create your profile",
+            fontSize = 28.sp,
+            fontWeight = FontWeight.Bold,
+            color = Color.Black
+        )
+
+        Spacer(modifier = Modifier.height(32.dp))
+        
+        CustomTextField(
+            value = name,
+            onValueChange = { name = it },
+            label = "Full Name",
+            backgroundColor = Color(0xFFF5F5F5)
+        )
+        
+        Spacer(modifier = Modifier.height(16.dp))
+
+        CustomTextField(
+            value = email,
+            onValueChange = { email = it },
+            label = "Email",
+            backgroundColor = Color(0xFFF5F5F5)
         )
         
         Spacer(modifier = Modifier.height(16.dp))
         
-        TextButton(onClick = onNext) {
-            Text("Skip for now", color = Color.Gray)
-        }
+        CustomTextField(
+            value = password,
+            onValueChange = { password = it },
+            label = "Password",
+            isPassword = true,
+            backgroundColor = Color(0xFFF5F5F5)
+        )
+
+        Spacer(modifier = Modifier.weight(1f))
+
+        PushableButton(
+            text = if (authState is AuthState.Loading) "Creating..." else "Create Account",
+            isLoading = authState is AuthState.Loading,
+            enabled = name.isNotEmpty() && email.isNotEmpty() && password.isNotEmpty(),
+            onClick = {
+                viewModel.register(name, email, password)
+            }
+        )
     }
 }

@@ -1,0 +1,44 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <!-- Perfectly Balanced & Centered Owl Face Contour -->
+    <!-- X-limits: 4 to 20 (symmetric around X=12) -->
+    <!-- Y-limits: 4.5 to 19.5 (symmetric around Y=12) -->
+    
+    <!-- Outer Head Outline -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M12,4.5C9.2,4.5 7.0,5.5 5.5,7.2C4.0,8.9 3.5,11.2 3.5,13.8C3.5,17.2 6.5,20.2 12,21.2C17.5,20.2 20.5,17.2 20.5,13.8C20.5,11.2 20.0,8.9 18.5,7.2C17.0,5.5 14.8,4.5 12,4.5ZM12,6.0C14.0,6.0 15.6,6.8 16.8,8.2C17.8,9.4 18.5,11.2 18.5,13.8C18.5,16.5 15.8,18.8 12,19.6C8.2,18.8 5.5,16.5 5.5,13.8C5.5,11.2 6.2,9.4 7.2,8.2C8.4,6.8 10.0,6.0 12,6.0Z"/>
+    
+    <!-- Left Eye / Glasses Outline -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M9,11C10.4,11 11.5,12.1 11.5,13.5C11.5,14.9 10.4,16 9,16C7.6,16 6.5,14.9 6.5,13.5C6.5,12.1 7.6,11 9,11ZM9,12.2C8.3,12.2 7.7,12.8 7.7,13.5C7.7,14.2 8.3,14.8 9,14.8C9.7,14.8 10.3,12.8 10.3,13.5C10.3,14.2 9.7,14.8 9,14.8Z"/>
+    
+    <!-- Right Eye / Glasses Outline -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M15,11C16.4,11 17.5,12.1 17.5,13.5C17.5,14.9 16.4,16 15,16C13.6,16 12.5,14.9 12.5,13.5C12.5,12.1 13.6,11 15,11ZM15,12.2C14.3,12.2 13.7,12.8 13.7,13.5C13.7,14.2 14.3,14.8 15,14.8C15.7,14.8 16.3,12.8 16.3,13.5C16.3,14.2 15.7,14.8 15,14.8Z"/>
+    
+    <!-- Glasses Bridge Connect -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M11,12.8h2v1.4h-2z"/>
+    
+    <!-- Beak -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M12,14.8l1,1.7h-2z"/>
+
+    <!-- Left Ear Peak / Feather Horn -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M4.5,7.0l2,2h-3.2z"/>
+        
+    <!-- Right Ear Peak / Feather Horn -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M19.5,7.0l1.2,2h-3.2z"/>
+</vector>

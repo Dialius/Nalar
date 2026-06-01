@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Padded and perfectly centered Nalar logo to match the second screen -->
+    <item
+        android:drawable="@drawable/logo_nalar_premium"
+        android:width="72dp"
+        android:height="72dp"
+        android:gravity="center" />
+</layer-list>

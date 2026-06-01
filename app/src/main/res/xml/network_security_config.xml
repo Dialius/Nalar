@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+    <!-- Izinkan semua koneksi HTTPS dari server manapun (termasuk Hostinger) -->
+    <base-config cleartextTrafficPermitted="true">
+        <trust-anchors>
+            <!-- Percayai semua CA yang sudah ada di sistem Android -->
+            <certificates src="system" />
+            <!-- Percayai juga CA dari pengguna (untuk debug di emulator) -->
+            <certificates src="user" />
+        </trust-anchors>
+    </base-config>
+</network-security-config>
