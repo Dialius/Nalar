@@ -15,7 +15,7 @@ Nalar is split into two primary decoupled components: a modern Jetpack Compose A
 
 ```mermaid
 graph TD
-    subgraph Android Client (com.davinza.nalar)
+    subgraph "Android Client (com.davinza.nalar)"
         UI[Jetpack Compose UI Layer]
         VM[MVVM ViewModels]
         UPM[UserProgressManager]
@@ -24,7 +24,7 @@ graph TD
         FCM[Firebase Cloud Messaging]
     end
 
-    subgraph Backend API (Express.js)
+    subgraph "Backend API (Express.js)"
         SRV[Express Server]
         RTS[Express Routes]
         MW[Auth & Admin Middleware]
