@@ -8,6 +8,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -394,6 +395,8 @@ fun NotificationSettingsScreen(onBackClick: () -> Unit) {
         mutableStateOf(manager.isEnabled(context, manager.CHANNEL_KEY))
     }
 
+    var manualNotificationEnabled by remember { mutableStateOf(false) }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -412,6 +415,7 @@ fun NotificationSettingsScreen(onBackClick: () -> Unit) {
             modifier = Modifier
                 .fillMaxSize()
                 .padding(horizontal = 24.dp)
+                .verticalScroll(rememberScrollState())
         ) {
             Spacer(modifier = Modifier.height(24.dp))
 
@@ -476,6 +480,52 @@ fun NotificationSettingsScreen(onBackClick: () -> Unit) {
                     }
                 }
             )
+
+            NotificationToggleRow(
+                title = "Notifikasi Manual",
+                description = "Aktifkan untuk membuka opsi uji coba pengiriman notifikasi penyemangat secara manual.",
+                checked = manualNotificationEnabled,
+                onCheckedChange = { enabled ->
+                    manualNotificationEnabled = enabled
+                }
+            )
+
+            AnimatedVisibility(
+                visible = manualNotificationEnabled,
+                enter = expandVertically() + fadeIn(),
+                exit = shrinkVertically() + fadeOut()
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    PushableButton(
+                        text = "Kirim Notifikasi Uji Coba 🚀",
+                        onClick = {
+                            manager.showNotification(
+                                context = context,
+                                title = "🦉 Halo Scholar! Ini Notifikasi Uji Coba",
+                                message = "Luar biasa! Fitur notifikasi manual Nalar berfungsi dengan baik. Yuk, lanjut belajar dan raih mimpimu! 🧠🚀",
+                                channelId = manager.CHANNEL_RANK
+                            )
+                        },
+                        backgroundColor = Color(0xFF194BDF),
+                        textColor = Color.White,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = "Klik tombol di atas untuk memicu notifikasi secara instan.",
+                        fontSize = 12.sp,
+                        color = Color.Gray,
+                        textAlign = TextAlign.Center
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(32.dp))
         }
     }
 }
