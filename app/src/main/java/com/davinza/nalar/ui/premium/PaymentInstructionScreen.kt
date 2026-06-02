@@ -61,6 +61,13 @@ fun PaymentInstructionScreen(
             when (pollingState) {
                 is PaymentPollingState.Paid -> {
                     hasNavigated = true
+                    // Tampilkan notifikasi penyemangat premium aktif
+                    com.davinza.nalar.utils.NalarNotificationManager.showNotification(
+                        context = context,
+                        title = "👑 Premium Nalar Aktif!",
+                        message = "Kunci belajar kini tak terbatas (∞). Teruslah berproses dan capai prestasi tertinggimu! 🚀",
+                        channelId = com.davinza.nalar.utils.NalarNotificationManager.CHANNEL_RANK
+                    )
                     onPaymentSuccess()
                 }
                 is PaymentPollingState.Expired -> {
