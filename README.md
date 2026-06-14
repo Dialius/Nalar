@@ -191,4 +191,4 @@ Nalar features a robust premium monetization path utilizing the Midtrans Sandbox
 ---
 
 ## 📄 License
-This repository is licensed under the **ISC License**. All rights reserved. Original designs and code assets are property of Dialius/Nalar project.
+This repository is licensed under **Proprietary / All Rights Reserved**. This project is private and commercial; copying, distribution, modification, or unauthorized use of this codebase is strictly prohibited without explicit permission.
